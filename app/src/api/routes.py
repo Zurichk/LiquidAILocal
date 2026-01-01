@@ -6,6 +6,7 @@ con el modelo de lenguaje.
 """
 
 import logging
+import threading
 import time
 from functools import wraps
 from typing import Any, Callable, Optional
@@ -104,7 +105,7 @@ def model_info() -> tuple[Response, int]:
 @require_api_key
 def load_model() -> tuple[Response, int]:
     """
-    Carga el modelo en memoria.
+    Carga el modelo en memoria de forma asíncrona.
 
     Returns:
         Estado de la carga del modelo.
@@ -117,23 +118,32 @@ def load_model() -> tuple[Response, int]:
             "message": "El modelo ya está cargado",
         }), 200
 
-    try:
-        start_time = time.time()
-        service.load_model()
-        load_time = time.time() - start_time
-
+    if getattr(service, 'is_loading', False):
         return jsonify({
             "success": True,
-            "message": "Modelo cargado exitosamente",
-            "load_time_seconds": round(load_time, 2),
+            "message": "La carga del modelo está en progreso",
         }), 200
 
-    except Exception as e:
-        logger.error("Error al cargar el modelo: %s", str(e))
-        return jsonify({
-            "success": False,
-            "error": str(e),
-        }), 500
+    # Iniciar carga en segundo plano
+    service.is_loading = True
+
+    def load_worker():
+        try:
+            logger.info("Iniciando carga del modelo en thread separado")
+            service.load_model()
+            logger.info("Modelo cargado exitosamente")
+        except Exception as e:
+            logger.error("Error al cargar el modelo: %s", str(e))
+        finally:
+            service.is_loading = False
+
+    thread = threading.Thread(target=load_worker, daemon=True)
+    thread.start()
+
+    return jsonify({
+        "success": True,
+        "message": "Carga del modelo iniciada en segundo plano",
+    }), 200
 
 
 @api_bp.route("/model/unload", methods=["POST"])
@@ -160,6 +170,33 @@ def unload_model() -> tuple[Response, int]:
             "success": False,
             "error": str(e),
         }), 500
+
+
+@api_bp.route("/model/status", methods=["GET"])
+def get_model_status() -> tuple[Response, int]:
+    """
+    Obtiene el estado de carga del modelo.
+
+    Returns:
+        Estado del modelo: loaded, loading, not_loaded
+    """
+    service = get_llm_service()
+
+    if service.is_loaded:
+        return jsonify({
+            "status": "loaded",
+            "message": "El modelo está cargado y listo para usar"
+        }), 200
+    elif getattr(service, 'is_loading', False):
+        return jsonify({
+            "status": "loading",
+            "message": "El modelo se está cargando"
+        }), 200
+    else:
+        return jsonify({
+            "status": "not_loaded",
+            "message": "El modelo no está cargado"
+        }), 200
 
 
 @api_bp.route("/chat/completions", methods=["POST"])

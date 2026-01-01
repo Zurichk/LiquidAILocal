@@ -72,6 +72,8 @@ class AEPLLMService:
         self.model = None
         self.tokenizer = None
         self.is_loaded = False
+        self.is_loading = False
+        self.load_thread: Optional[threading.Thread] = None
         self._initialized = True
         logger.info("AEPLLMService inicializado con config: %s", self.config.to_dict())
 
