@@ -88,7 +88,8 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:5049/api/v1/health || exit 1
 
 # Crear swap file para manejar carga del modelo
-RUN fallocate -l 4G /swapfile && \
+RUN swapoff /swapfile 2>/dev/null || true && \
+    fallocate -l 6G /swapfile && \
     chmod 600 /swapfile && \
     mkswap /swapfile && \
     swapon /swapfile && \
