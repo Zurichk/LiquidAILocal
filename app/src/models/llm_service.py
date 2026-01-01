@@ -119,6 +119,7 @@ class AEPLLMService:
                 "torch_dtype": torch_dtype,
                 "cache_dir": self.config.cache_dir,
                 "trust_remote_code": True,
+                "use_multiprocessing": False,
             }
 
             # Solo agregar device_map si no es None
