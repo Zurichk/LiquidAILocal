@@ -4,7 +4,7 @@
 # =============================================================================
 
 # Etapa 1: Build stage
-FROM pytorch/pytorch:2.1.0-cpu as builder
+FROM python:3.11-slim as builder
 
 # Argumentos de construcción
 ARG DEBIAN_FRONTEND=noninteractive
@@ -27,12 +27,12 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 # Instalar dependencias de Python
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
 
 # =============================================================================
 # Etapa 2: Runtime stage
 # =============================================================================
-FROM pytorch/pytorch:2.1.0-cpu as runtime
+FROM python:3.11-slim as runtime
 
 # Metadata
 LABEL maintainer="AEP Team"
