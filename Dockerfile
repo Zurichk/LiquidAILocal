@@ -87,6 +87,13 @@ EXPOSE 5049
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
     CMD curl -f http://localhost:5049/api/v1/health || exit 1
 
+# Crear swap file para manejar carga del modelo
+RUN fallocate -l 4G /swapfile && \
+    chmod 600 /swapfile && \
+    mkswap /swapfile && \
+    swapon /swapfile && \
+    echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
 # Cambiar a usuario no-root
 USER appuser
 
