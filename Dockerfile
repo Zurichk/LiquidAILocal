@@ -91,9 +91,9 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 USER appuser
 
 # Script de inicio
-COPY --chown=appuser:appgroup docker-entrypoint.sh /app/
-RUN chmod +x /app/docker-entrypoint.sh
+# COPY --chown=appuser:appgroup docker-entrypoint.sh /app/
+# RUN chmod +x /app/docker-entrypoint.sh
 
 # Comando por defecto
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+# ENTRYPOINT ["/app/docker-entrypoint.sh"]
 CMD ["gunicorn", "--bind", "0.0.0.0:5049", "--workers", "1", "--threads", "4", "--timeout", "300", "app.src.app:app"]
