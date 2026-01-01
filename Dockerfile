@@ -3,31 +3,31 @@
 # Optimizado para despliegue en Coolify/VPS
 # =============================================================================
 
-# # Etapa 1: Build stage
-# FROM python:3.11-slim as builder
+# Etapa 1: Build stage
+FROM python:3.11-slim as builder
 
-# # Argumentos de construcción
-# ARG DEBIAN_FRONTEND=noninteractive
+# Argumentos de construcción
+ARG DEBIAN_FRONTEND=noninteractive
 
-# # Instalar dependencias del sistema necesarias para compilación
-# RUN apt-get update && apt-get install -y --no-install-recommends \
-#     build-essential \
-#     git \
-#     && rm -rf /var/lib/apt/lists/*
+# Instalar dependencias del sistema necesarias para compilación
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
-# # Crear directorio de trabajo
-# WORKDIR /app
+# Crear directorio de trabajo
+WORKDIR /app
 
-# # Copiar requirements primero para aprovechar cache de Docker
-# COPY requirements.txt .
+# Copiar requirements primero para aprovechar cache de Docker
+COPY requirements.txt .
 
-# # Crear entorno virtual e instalar dependencias
-# RUN python -m venv /opt/venv
-# ENV PATH="/opt/venv/bin:$PATH"
+# Crear entorno virtual e instalar dependencias
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-# # Instalar dependencias de Python
-# RUN pip install --no-cache-dir --upgrade pip && \
-#     pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
+# Instalar dependencias de Python
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
 
 # =============================================================================
 # Etapa 2: Runtime stage
@@ -45,17 +45,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 # Instalar dependencias mínimas del runtime
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
-    build-essential \
-    git \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
-
-# Copiar requirements primero para aprovechar cache de Docker
-COPY requirements.txt .
-
-# Instalar dependencias de Python
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
 
 # Crear usuario no-root para seguridad
 RUN groupadd -r appgroup && useradd -r -g appgroup appuser
@@ -64,9 +55,9 @@ RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 RUN mkdir -p /app /app/models /app/logs && \
     chown -R appuser:appgroup /app
 
-# # Copiar entorno virtual desde builder
-# COPY --from=builder /opt/venv /opt/venv
-# ENV PATH="/opt/venv/bin:$PATH"
+# Copiar entorno virtual desde builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
 # Configurar directorio de trabajo
 WORKDIR /app
@@ -105,4 +96,4 @@ USER appuser
 
 # Comando por defecto
 # ENTRYPOINT ["/app/docker-entrypoint.sh"]
-CMD ["gunicorn", "--bind", "0.0.0.0:5049", "--workers", "1", "--threads", "4", "--timeout", "300", "app.src.app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5049", "--workers", "1", "--threads", "4", "--timeout", "1800", "app.src.app:app"]
