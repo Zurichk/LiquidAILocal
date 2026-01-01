@@ -70,7 +70,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app \
     AEP_HOST=0.0.0.0 \
-    AEP_PORT=5000 \
+    AEP_PORT=5049 \
     AEP_DEBUG=false \
     HF_HOME=/app/models \
     AEP_LOAD_MODEL_ON_STARTUP=false \
@@ -81,7 +81,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     HF_HOME=/app/models
 
 # Exponer puerto
-EXPOSE 5000
+EXPOSE 5049
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
@@ -96,4 +96,4 @@ RUN chmod +x /app/docker-entrypoint.sh
 
 # Comando por defecto
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--threads", "4", "--timeout", "300", "app.src.app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5049", "--workers", "1", "--threads", "4", "--timeout", "300", "app.src.app:app"]

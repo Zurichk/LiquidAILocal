@@ -6,11 +6,11 @@
 # Python
 # =============================================================================
 .env.example
-docker-entrypoint.sh
 share/
 Scripts/
 Include/
 pyvenv.cfg
+app/docs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
