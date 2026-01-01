@@ -4,7 +4,7 @@
 # =============================================================================
 
 # Etapa 1: Build stage
-FROM python:3.11-slim as builder
+FROM pytorch/pytorch:2.1.0-cpu as builder
 
 # Argumentos de construcción
 ARG DEBIAN_FRONTEND=noninteractive
@@ -32,7 +32,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # =============================================================================
 # Etapa 2: Runtime stage
 # =============================================================================
-FROM python:3.11-slim as runtime
+FROM pytorch/pytorch:2.1.0-cpu as runtime
 
 # Metadata
 LABEL maintainer="AEP Team"
