@@ -135,8 +135,9 @@ conda-env/
 # =============================================================================
 
 # Directorio de modelos descargados (solo en raíz del proyecto)
-app/docs/
-models/
+/models/
+# Permitir código fuente en app/src/models/
+!/app/src/models/
 *.bin
 *.safetensors
 *.gguf
