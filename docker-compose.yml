@@ -1,0 +1,80 @@
+# =============================================================================
+# Docker Compose para LiquidAI LFM2-2.6B Chat Application
+# =============================================================================
+# Uso:
+#   - Desarrollo: docker-compose up
+#   - Producción: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# =============================================================================
+
+services:
+  liquidai-chat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: liquidai-chat
+    restart: unless-stopped
+    
+    ports:
+      - "${AEP_PORT:-5049}:5049"
+    
+    volumes:
+      # Persistir modelos descargados
+      - liquidai-models:/app/models
+      # Persistir logs
+      - liquidai-logs:/app/logs
+    
+    environment:
+      # Configuración de la aplicación
+      - AEP_HOST=0.0.0.0
+      - AEP_PORT=5000
+      - AEP_DEBUG=${AEP_DEBUG:-false}
+      - AEP_SECRET_KEY=${AEP_SECRET_KEY:-change-me-in-production}
+      - AEP_API_KEY=${AEP_API_KEY:-}
+      
+      # Configuración del modelo
+      - HF_HOME=/app/models
+      - AEP_LOAD_MODEL_ON_STARTUP=${AEP_LOAD_MODEL_ON_STARTUP:-false}
+      - AEP_DEVICE_MAP=${AEP_DEVICE_MAP:-auto}
+      - AEP_MAX_TOKENS=${AEP_MAX_TOKENS:-512}
+      - AEP_TEMPERATURE=${AEP_TEMPERATURE:-0.3}
+      - AEP_USE_FLASH_ATTENTION=${AEP_USE_FLASH_ATTENTION:-false}
+      
+      # Cache de HuggingFace (usando solo HF_HOME para simplificar)
+      - TRANSFORMERS_CACHE=/app/models
+      
+      # Token de HuggingFace (opcional, para modelos privados)
+      - HF_TOKEN=${HF_TOKEN:-}
+    
+    # Para GPU NVIDIA (descomentar si tienes GPU)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5049/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  liquidai-models:
+    name: liquidai-models
+  liquidai-logs:
+    name: liquidai-logs
+
+# =============================================================================
+# Configuración con GPU (archivo separado: docker-compose.gpu.yml)
+# =============================================================================
+# Para usar GPU, ejecutar:
+# docker-compose -f docker-compose.yml -f docker-compose.gpu.yml up -d

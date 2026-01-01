@@ -1,0 +1,318 @@
+# =============================================================================
+# .gitignore para LiquidAI LFM2-2.6B Chat Application
+# =============================================================================
+
+# =============================================================================
+# Python
+# =============================================================================
+.env.example
+docker-entrypoint.sh
+share/
+Scripts/
+Include/
+pyvenv.cfg
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# PEP 582
+__pypackages__/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# =============================================================================
+# Virtual Environments
+# =============================================================================
+
+venv/
+ENV/
+env/
+.venv/
+.env.local
+virtualenv/
+
+# Conda
+conda-env/
+*.conda
+
+# =============================================================================
+# Models & Data (IMPORTANTE: No subir modelos al repositorio)
+# =============================================================================
+
+# Directorio de modelos descargados (solo en raíz del proyecto)
+app/docs/
+models/
+*.bin
+*.safetensors
+*.gguf
+*.ggml
+*.pt
+*.pth
+*.onnx
+
+
+# Cache de HuggingFace
+.cache/
+huggingface/
+
+# Datos de entrenamiento/fine-tuning
+data/
+datasets/
+
+# =============================================================================
+# IDE & Editors
+# =============================================================================
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# =============================================================================
+# Operating System
+# =============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# Docker
+# =============================================================================
+
+# Docker ignore (el .dockerignore es separado pero listamos aquí también)
+docker-compose.override.yml
+
+# =============================================================================
+# GPU - No usado por ahora
+# =============================================================================
+
+# Configuraciones GPU
+docker-compose.gpu.yml
+Dockerfile.gpu
+requirements-gpu.txt
+
+# Scripts de verificación GPU
+check_gpu.py
+install_base.ps1
+
+# =============================================================================
+# Logs & Temporary Files
+# =============================================================================
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+
+# =============================================================================
+# Environment & Secrets
+# =============================================================================
+
+# Environment files with secrets
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# Secrets
+secrets/
+*.pem
+*.key
+*.crt
+*.p12
+
+# =============================================================================
+# Application Specific
+# =============================================================================
+
+# Flask instance folder
+instance/
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads
+uploads/
+
+# Static files generated
+staticfiles/
+
+# Node modules (si usas npm para assets)
+node_modules/
+package-lock.json
+yarn.lock
+
+# =============================================================================
+# Build & Distribution
+# =============================================================================
+
+# Compilados
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Archives
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip

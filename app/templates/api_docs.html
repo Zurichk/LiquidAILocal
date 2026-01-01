@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación API - {{ config.app_name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/docs.css') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='img/favicon.svg') }}">
+</head>
+<body>
+    <div class="docs-container">
+        <!-- Sidebar Navigation -->
+        <aside class="docs-sidebar">
+            <div class="sidebar-header">
+                <a href="/" class="logo">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
+                    </svg>
+                    <span>LiquidAI API</span>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#introduction" class="active">Introducción</a></li>
+                    <li><a href="#authentication">Autenticación</a></li>
+                    <li><a href="#endpoints">Endpoints</a>
+                        <ul>
+                            <li><a href="#health">Health Check</a></li>
+                            <li><a href="#model-info">Info del Modelo</a></li>
+                            <li><a href="#load-model">Cargar Modelo</a></li>
+                            <li><a href="#unload-model">Descargar Modelo</a></li>
+                            <li><a href="#chat-completions">Chat Completions</a></li>
+                            <li><a href="#generate">Generate</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#streaming">Streaming</a></li>
+                    <li><a href="#errors">Errores</a></li>
+                    <li><a href="#examples">Ejemplos</a></li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="/" class="back-to-chat">
+                    ← Volver al Chat
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="docs-content">
+            <section id="introduction" class="docs-section">
+                <h1>API de LiquidAI Chat</h1>
+                <p class="lead">
+                    Esta API te permite interactuar con el modelo LiquidAI LFM2-2.6B a través de endpoints REST. 
+                    La API es compatible con el formato de OpenAI, facilitando la integración con aplicaciones existentes.
+                </p>
+                
+                <div class="info-box">
+                    <h4>ℹ️ Información del Modelo</h4>
+                    <ul>
+                        <li><strong>Modelo:</strong> LiquidAI/LFM2-2.6B</li>
+                        <li><strong>Parámetros:</strong> 2.6B</li>
+                        <li><strong>Contexto máximo:</strong> 32,768 tokens</li>
+                        <li><strong>Idiomas:</strong> Inglés, Español, Francés, Alemán, Árabe, Chino, Japonés, Coreano</li>
+                    </ul>
+                </div>
+
+                <h3>URL Base</h3>
+                <div class="code-block">
+                    <code>http://localhost:5049/api/v1</code>
+                </div>
+            </section>
+
+            <section id="authentication" class="docs-section">
+                <h2>Autenticación</h2>
+                <p>
+                    La autenticación es opcional y se configura mediante la variable de entorno <code>AEP_API_KEY</code>.
+                    Si está configurada, debes incluir la API key en todas las peticiones.
+                </p>
+                
+                <h4>Headers de Autenticación</h4>
+                <p>Puedes usar cualquiera de estos métodos:</p>
+                
+                <div class="code-block">
+                    <pre><code>X-API-Key: tu-api-key</code></pre>
+                </div>
+                
+                <p>O usando el header Authorization:</p>
+                
+                <div class="code-block">
+                    <pre><code>Authorization: Bearer tu-api-key</code></pre>
+                </div>
+            </section>
+
+            <section id="endpoints" class="docs-section">
+                <h2>Endpoints</h2>
+
+                <!-- Health Check -->
+                <article id="health" class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <code>/api/v1/health</code>
+                    </div>
+                    <p>Verifica el estado de la API y si el modelo está cargado.</p>
+                    
+                    <h4>Respuesta</h4>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+    "status": "healthy",
+    "model_loaded": true,
+    "timestamp": 1704067200.123
+}</code></pre>
+                    </div>
+                </article>
+
+                <!-- Model Info -->
+                <article id="model-info" class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <code>/api/v1/model/info</code>
+                    </div>
+                    <p>Obtiene información detallada sobre el modelo cargado.</p>
+                    
+                    <h4>Respuesta</h4>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+    "success": true,
+    "data": {
+        "model_id": "LiquidAI/LFM2-2.6B",
+        "is_loaded": true,
+        "device": "cuda:0",
+        "dtype": "torch.bfloat16",
+        "config": {
+            "max_new_tokens": 512,
+            "temperature": 0.3,
+            "min_p": 0.15,
+            "repetition_penalty": 1.05
+        }
+    }
+}</code></pre>
+                    </div>
+                </article>
+
+                <!-- Load Model -->
+                <article id="load-model" class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <code>/api/v1/model/load</code>
+                    </div>
+                    <p>Carga el modelo en memoria. Este proceso puede tardar varios minutos dependiendo del hardware.</p>
+                    
+                    <h4>Respuesta</h4>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+    "success": true,
+    "message": "Modelo cargado exitosamente",
+    "load_time_seconds": 45.23
+}</code></pre>
+                    </div>
+                </article>
+
+                <!-- Unload Model -->
+                <article id="unload-model" class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <code>/api/v1/model/unload</code>
+                    </div>
+                    <p>Descarga el modelo de la memoria para liberar recursos.</p>
+                    
+                    <h4>Respuesta</h4>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+    "success": true,
+    "message": "Modelo descargado de memoria"
+}</code></pre>
+                    </div>
+                </article>
+
+                <!-- Chat Completions -->
+                <article id="chat-completions" class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <code>/api/v1/chat/completions</code>
+                    </div>
+                    <p>
+                        Genera una respuesta de chat basada en una conversación. 
+                        Este endpoint es <strong>compatible con el formato de OpenAI</strong>.
+                    </p>
+                    
+                    <h4>Request Body</h4>
+                    <table class="params-table">
+                        <thead>
+                            <tr>
+                                <th>Parámetro</th>
+                                <th>Tipo</th>
+                                <th>Requerido</th>
+                                <th>Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>messages</code></td>
+                                <td>array</td>
+                                <td>Sí</td>
+                                <td>Lista de mensajes de la conversación</td>
+                            </tr>
+                            <tr>
+                                <td><code>max_tokens</code></td>
+                                <td>integer</td>
+                                <td>No</td>
+                                <td>Máximo de tokens a generar (default: 512)</td>
+                            </tr>
+                            <tr>
+                                <td><code>temperature</code></td>
+                                <td>float</td>
+                                <td>No</td>
+                                <td>Temperatura de generación (default: 0.3)</td>
+                            </tr>
+                            <tr>
+                                <td><code>min_p</code></td>
+                                <td>float</td>
+                                <td>No</td>
+                                <td>Probabilidad mínima para sampling (default: 0.15)</td>
+                            </tr>
+                            <tr>
+                                <td><code>repetition_penalty</code></td>
+                                <td>float</td>
+                                <td>No</td>
+                                <td>Penalización por repetición (default: 1.05)</td>
+                            </tr>
+                            <tr>
+                                <td><code>system</code></td>
+                                <td>string</td>
+                                <td>No</td>
+                                <td>System prompt personalizado</td>
+                            </tr>
+                            <tr>
+                                <td><code>stream</code></td>
+                                <td>boolean</td>
+                                <td>No</td>
+                                <td>Habilitar streaming de respuesta (default: false)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Formato de Mensaje</h4>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+    "role": "user" | "assistant" | "system",
+    "content": "Contenido del mensaje"
+}</code></pre>
+                    </div>
+
+                    <h4>Ejemplo de Request</h4>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+    "messages": [
+        {"role": "user", "content": "¿Qué es la inteligencia artificial?"}
+    ],
+    "max_tokens": 256,
+    "temperature": 0.3,
+    "stream": false
+}</code></pre>
+                    </div>
+
+                    <h4>Ejemplo de Respuesta</h4>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+    "id": "chatcmpl-1704067200",
+    "object": "chat.completion",
+    "created": 1704067200,
+    "model": "LiquidAI/LFM2-2.6B",
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "La inteligencia artificial (IA) es..."
+            },
+            "finish_reason": "stop"
+        }
+    ],
+    "usage": {
+        "generation_time_seconds": 2.34
+    }
+}</code></pre>
+                    </div>
+                </article>
+
+                <!-- Generate -->
+                <article id="generate" class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <code>/api/v1/generate</code>
+                    </div>
+                    <p>Endpoint simplificado para generación de texto a partir de un prompt.</p>
+                    
+                    <h4>Request Body</h4>
+                    <table class="params-table">
+                        <thead>
+                            <tr>
+                                <th>Parámetro</th>
+                                <th>Tipo</th>
+                                <th>Requerido</th>
+                                <th>Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>prompt</code></td>
+                                <td>string</td>
+                                <td>Sí</td>
+                                <td>Texto del prompt</td>
+                            </tr>
+                            <tr>
+                                <td><code>max_tokens</code></td>
+                                <td>integer</td>
+                                <td>No</td>
+                                <td>Máximo de tokens a generar</td>
+                            </tr>
+                            <tr>
+                                <td><code>temperature</code></td>
+                                <td>float</td>
+                                <td>No</td>
+                                <td>Temperatura de generación</td>
+                            </tr>
+                            <tr>
+                                <td><code>system</code></td>
+                                <td>string</td>
+                                <td>No</td>
+                                <td>System prompt personalizado</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h4>Ejemplo de Request</h4>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+    "prompt": "Escribe un haiku sobre la programación",
+    "max_tokens": 100
+}</code></pre>
+                    </div>
+
+                    <h4>Ejemplo de Respuesta</h4>
+                    <div class="code-block">
+                        <pre><code class="language-json">{
+    "success": true,
+    "response": "Código fluye suave\nbugs se esconden en la sombra\ndebug ilumina",
+    "generation_time_seconds": 1.23
+}</code></pre>
+                    </div>
+                </article>
+            </section>
+
+            <section id="streaming" class="docs-section">
+                <h2>Streaming</h2>
+                <p>
+                    El endpoint <code>/api/v1/chat/completions</code> soporta streaming de respuestas 
+                    mediante Server-Sent Events (SSE). Para habilitarlo, incluye <code>"stream": true</code> 
+                    en el request.
+                </p>
+                
+                <h4>Ejemplo de Request con Streaming</h4>
+                <div class="code-block">
+                    <pre><code class="language-bash">curl -X POST http://localhost:5049/api/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -d '{
+        "messages": [{"role": "user", "content": "Hola"}],
+        "stream": true
+    }'</code></pre>
+                </div>
+
+                <h4>Formato de Eventos SSE</h4>
+                <div class="code-block">
+                    <pre><code>data: {"id":"chatcmpl-123","choices":[{"delta":{"content":"Hola"}}]}
+
+data: {"id":"chatcmpl-123","choices":[{"delta":{"content":"!"}}]}
+
+data: [DONE]</code></pre>
+                </div>
+            </section>
+
+            <section id="errors" class="docs-section">
+                <h2>Códigos de Error</h2>
+                <table class="params-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>400</code></td>
+                            <td>Bad Request - Parámetros inválidos o faltantes</td>
+                        </tr>
+                        <tr>
+                            <td><code>401</code></td>
+                            <td>Unauthorized - API key inválida o no proporcionada</td>
+                        </tr>
+                        <tr>
+                            <td><code>404</code></td>
+                            <td>Not Found - Endpoint no encontrado</td>
+                        </tr>
+                        <tr>
+                            <td><code>500</code></td>
+                            <td>Internal Server Error - Error interno del servidor</td>
+                        </tr>
+                        <tr>
+                            <td><code>503</code></td>
+                            <td>Service Unavailable - El modelo no está cargado</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Formato de Error</h4>
+                <div class="code-block">
+                    <pre><code class="language-json">{
+    "error": "Tipo de error",
+    "message": "Descripción detallada del error"
+}</code></pre>
+                </div>
+            </section>
+
+            <section id="examples" class="docs-section">
+                <h2>Ejemplos de Código</h2>
+
+                <h3>Python</h3>
+                <div class="code-block">
+                    <pre><code class="language-python">import requests
+
+BASE_URL = "http://localhost:5049/api/v1"
+API_KEY = "tu-api-key"  # Opcional
+
+headers = {
+    "Content-Type": "application/json",
+    "X-API-Key": API_KEY
+}
+
+# Chat completion
+response = requests.post(
+    f"{BASE_URL}/chat/completions",
+    headers=headers,
+    json={
+        "messages": [
+            {"role": "user", "content": "¿Cómo estás?"}
+        ],
+        "max_tokens": 256
+    }
+)
+
+result = response.json()
+print(result["choices"][0]["message"]["content"])</code></pre>
+                </div>
+
+                <h3>JavaScript (Node.js)</h3>
+                <div class="code-block">
+                    <pre><code class="language-javascript">const BASE_URL = 'http://localhost:5049/api/v1';
+const API_KEY = 'tu-api-key'; // Opcional
+
+async function chat(message) {
+    const response = await fetch(`${BASE_URL}/chat/completions`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': API_KEY
+        },
+        body: JSON.stringify({
+            messages: [{ role: 'user', content: message }],
+            max_tokens: 256
+        })
+    });
+    
+    const data = await response.json();
+    return data.choices[0].message.content;
+}
+
+chat('Hola, ¿cómo estás?').then(console.log);</code></pre>
+                </div>
+
+                <h3>cURL</h3>
+                <div class="code-block">
+                    <pre><code class="language-bash"># Health check
+curl http://localhost:5049/api/v1/health
+
+# Cargar modelo
+curl -X POST http://localhost:5049/api/v1/model/load
+
+# Chat completion
+curl -X POST http://localhost:5049/api/v1/chat/completions \
+    -H "Content-Type: application/json" \
+    -H "X-API-Key: tu-api-key" \
+    -d '{
+        "messages": [{"role": "user", "content": "Hola"}],
+        "max_tokens": 256
+    }'</code></pre>
+                </div>
+
+                <h3>Python con Streaming</h3>
+                <div class="code-block">
+                    <pre><code class="language-python">import requests
+
+BASE_URL = "http://localhost:5049/api/v1"
+
+response = requests.post(
+    f"{BASE_URL}/chat/completions",
+    headers={"Content-Type": "application/json"},
+    json={
+        "messages": [{"role": "user", "content": "Cuéntame un chiste"}],
+        "stream": True
+    },
+    stream=True
+)
+
+for line in response.iter_lines():
+    if line:
+        line = line.decode('utf-8')
+        if line.startswith('data: '):
+            data = line[6:]
+            if data != '[DONE]':
+                import json
+                chunk = json.loads(data)
+                content = chunk['choices'][0]['delta'].get('content', '')
+                print(content, end='', flush=True)</code></pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Active link highlighting
+        const sections = document.querySelectorAll('.docs-section');
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

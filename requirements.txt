@@ -1,0 +1,22 @@
+# =============================================================================
+# Requirements para LiquidAI LFM2-2.6B Chat Application
+# =============================================================================
+
+# Web Framework
+Flask>=3.0.0
+Flask-CORS>=4.0.0
+gunicorn>=21.2.0
+
+# Machine Learning / LLM
+transformers>=4.55.0
+torch>=2.1.0
+accelerate>=0.25.0
+safetensors>=0.4.0
+huggingface-hub>=0.20.0
+
+# Utilities
+python-dotenv>=1.0.0
+requests>=2.31.0
+
+# Logging & Monitoring
+structlog>=23.2.0
